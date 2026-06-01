@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Lunch Ordering Agent Presentation</title>
+  <style>
+:root {
+  --bg: #0f172a;
+  --panel: #111827;
+  --ink: #e5e7eb;
+  --muted: #94a3b8;
+  --line: #334155;
+  --accent: #38bdf8;
+  --accent2: #a78bfa;
+  --good: #22c55e;
+  --bad: #ef4444;
+  --warn: #f59e0b;
+  --card: rgba(15, 23, 42, 0.78);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+body { overflow: hidden; }
+.deck { height: 100vh; width: 100vw; position: relative; }
+.slide {
+  display: none;
+  height: 100vh;
+  width: 100vw;
+  padding: 56px 72px 72px;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(56,189,248,0.17), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(167,139,250,0.18), transparent 30%),
+    linear-gradient(145deg, #020617 0%, #0f172a 48%, #111827 100%);
+}
+.slide.active { display: block; animation: fade .22s ease-out; }
+@keyframes fade { from { opacity: .4; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.slide-top { display: flex; justify-content: space-between; align-items: center; color: var(--accent); font-size: 14px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 36px; }
+h1 { font-size: clamp(38px, 5vw, 70px); line-height: 1.02; margin: 0; max-width: 1080px; letter-spacing: -0.04em; }
+h2 { font-size: clamp(18px, 2vw, 28px); line-height: 1.35; margin: 20px 0 34px; color: var(--muted); font-weight: 500; max-width: 1080px; }
+h3 { margin: 0 0 12px; font-size: 21px; }
+p, li, td, th { font-size: 20px; line-height: 1.45; }
+ul { margin: 8px 0 0; padding-left: 22px; }
+code { background: rgba(148,163,184,0.14); border: 1px solid rgba(148,163,184,0.22); border-radius: 8px; padding: 2px 7px; color: #e0f2fe; font-size: .9em; }
+.content { max-width: 1200px; }
+.columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.columns.two { grid-template-columns: repeat(2, 1fr); }
+.card, .problem-box, .insight, .warning {
+  border: 1px solid rgba(148,163,184,0.22);
+  background: rgba(15, 23, 42, 0.72);
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.22);
+}
+.card p { margin: 0; color: var(--muted); }
+.card.positive { border-color: rgba(34,197,94,.45); }
+.card.negative { border-color: rgba(239,68,68,.45); }
+.hero-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 34px 0 22px; max-width: 1050px; }
+.metric { padding: 26px; border-radius: 24px; border: 1px solid rgba(148,163,184,0.22); background: rgba(15, 23, 42, 0.7); }
+.metric span { display: block; font-size: 54px; font-weight: 800; color: #fff; letter-spacing: -0.05em; }
+.metric label { display: block; color: var(--muted); font-size: 17px; margin-top: 6px; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 26px; }
+.flow div { border: 1px solid rgba(56,189,248,.35); background: rgba(56,189,248,.08); border-radius: 18px; padding: 16px 18px; font-size: 18px; font-weight: 700; }
+.flow span { color: var(--accent); font-size: 26px; }
+table { border-collapse: collapse; width: 100%; border-radius: 20px; overflow: hidden; background: rgba(15,23,42,.78); border: 1px solid rgba(148,163,184,.22); }
+th { text-align: left; background: rgba(56,189,248,.13); color: #e0f2fe; }
+th, td { padding: 15px 16px; border-bottom: 1px solid rgba(148,163,184,.18); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+.insight { margin-top: 22px; border-color: rgba(56,189,248,.35); color: #dbeafe; }
+.warning { margin-top: 22px; border-color: rgba(245,158,11,.55); color: #fffbeb; }
+.small { font-size: 16px; }
+.muted { color: var(--muted); }
+.success-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.success-grid div { padding: 22px; border-radius: 20px; background: rgba(15,23,42,.72); border: 1px solid rgba(34,197,94,.32); }
+.success-grid b { color: #bbf7d0; font-size: 20px; }
+.success-grid p { margin: 8px 0 0; color: var(--muted); }
+.big-number { font-size: 52px; font-weight: 850; letter-spacing: -0.05em; color: #fff; margin: 10px 0 8px; }
+.roadmap { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.roadmap div { background: rgba(15,23,42,.72); border: 1px solid rgba(167,139,250,.32); border-radius: 22px; padding: 22px; }
+.roadmap span { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(167,139,250,.2); color: #ddd6fe; font-weight: 800; margin-bottom: 14px; }
+.roadmap p { color: var(--muted); margin: 0; font-size: 18px; }
+.script { display: grid; gap: 18px; }
+.script div { border-left: 5px solid var(--accent); padding: 18px 24px; background: rgba(15,23,42,.72); border-radius: 0 18px 18px 0; }
+.script p { margin: 6px 0 0; color: var(--muted); }
+.conclusion { display: grid; gap: 18px; max-width: 1050px; }
+.conclusion p { margin: 0; padding: 20px 24px; background: rgba(15,23,42,.72); border: 1px solid rgba(148,163,184,.22); border-radius: 20px; }
+.controls { position: fixed; right: 22px; bottom: 18px; display: flex; gap: 10px; z-index: 5; }
+button { border: 1px solid rgba(148,163,184,.3); background: rgba(15,23,42,.82); color: var(--ink); border-radius: 12px; padding: 10px 14px; font-size: 14px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+.progress { position: fixed; left: 0; bottom: 0; height: 5px; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; z-index: 6; transition: width .18s ease; }
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .slide { position: relative; min-height: 100vh; height: auto; padding: 36px 24px 80px; }
+  .columns, .columns.two, .hero-grid, .compare, .success-grid, .roadmap { grid-template-columns: 1fr; }
+  p, li, td, th { font-size: 17px; }
+  table { display: block; overflow-x: auto; }
+}
+@media print {
+  body { overflow: visible; background: #fff; color: #111; }
+  .slide { display: block !important; position: relative; page-break-after: always; height: 100vh; background: #fff; color: #111; }
+  .controls, .progress { display: none; }
+  h2, .muted, .card p, .success-grid p, .roadmap p, .script p { color: #444; }
+  .card, .problem-box, .insight, .warning, table, .success-grid div, .roadmap div, .script div, .conclusion p { background: #fff; border-color: #bbb; box-shadow: none; }
+  code { color: #111; background: #f3f4f6; }
+}
+</style>
+</head>
+<body>
+  <main class="deck">
+    
+<section class="slide" id="slide-1">
+  <div class="slide-top"><span>Day 3 Lab · Chatbot vs ReAct Agent</span><span>01/14</span></div>
+  <h1>Smart Lunch Ordering Agent</h1>
+  <h2>Phân tích từ pain point đến prototype và kế hoạch Version 1 dựa trên code hiện tại</h2>
+  <div class="content">
+        <div class="hero-grid">
+          <div class="metric"><span>40</span><label>offline tests passed</label></div>
+          <div class="metric"><span>4</span><label>core tool modules</label></div>
+          <div class="metric"><span>13</span><label>agent callable tools</label></div>
+          <div class="metric"><span>3</span><label>tracked demo requests</label></div>
+        </div>
+        <p class="small muted">Scope: lunch ordering workflow for a small team/class/company group.</p>
+        </div>
+</section>
+
+<section class="slide" id="slide-2">
+  <div class="slide-top"><span>Pain Point</span><span>02/14</span></div>
+  <h1>Quy trình đặt cơm thủ công tạo nhiều chi phí ẩn</h1>
+  <h2>Vấn đề không chỉ là chọn món; vấn đề chính là điều phối, tổng hợp và kiểm soát trạng thái.</h2>
+  <div class="content">
+        <div class="columns">
+          <div class="card"><h3>Người phụ trách</h3><p>Phải nhắc nhiều lần, đọc tin nhắn rời rạc, tổng hợp đơn, chia tiền và kiểm tra thanh toán thủ công.</p></div>
+          <div class="card"><h3>Thành viên nhóm</h3><p>Dễ quên chọn món, ghi thiếu note, chọn món không còn bán, hoặc không biết tổng tiền cần trả.</p></div>
+          <div class="card"><h3>Rủi ro vận hành</h3><p>Sai món, thiếu đơn, sai tổng bill, trễ deadline đặt hàng, mất thời gian follow-up.</p></div>
+        </div>
+        <div class="insight"><b>Insight:</b> Đây là bài toán workflow state management, không phải chỉ là chatbot hỏi đáp.</div>
+        </div>
+</section>
+
+<section class="slide" id="slide-3">
+  <div class="slide-top"><span>Problem Statement</span><span>03/14</span></div>
+  <h1>Làm sao tự động hóa luồng đặt cơm mà vẫn kiểm soát được dữ liệu thật?</h1>
+  <h2>Hệ thống cần hiểu yêu cầu tự nhiên, gọi đúng tool, cập nhật trạng thái và xuất kết quả có thể kiểm chứng.</h2>
+  <div class="content">
+        <div class="problem-box">
+          <p><b>Problem statement:</b> Trong nhóm nhỏ, quy trình đặt cơm trưa hằng ngày bị phân mảnh qua chat. Cần một assistant có khả năng kiểm tra menu thật, ghi nhận đơn, phát hiện người chưa chọn, tổng hợp bill và theo dõi thanh toán để giảm lỗi điều phối.</p>
+        </div>
+        <table>
+          <tr><th>Input</th><th>Processing</th><th>Output</th></tr>
+          <tr><td>Yêu cầu bằng tiếng Việt tự nhiên</td><td>ReAct loop + tools</td><td>Gợi ý món, lưu đơn, tổng hợp bill</td></tr>
+          <tr><td>Menu, members, orders</td><td>Validation + state update</td><td>Missing users, unpaid users, payment summary</td></tr>
+        </table>
+        </div>
+</section>
+
+<section class="slide" id="slide-4">
+  <div class="slide-top"><span>Solution Direction</span><span>04/14</span></div>
+  <h1>Baseline chatbot không đủ; ReAct agent phù hợp hơn</h1>
+  <h2>Prototype cố tình so sánh hai hướng để chứng minh giới hạn của LLM-only chatbot.</h2>
+  <div class="content">
+        <div class="compare">
+          <div class="card negative"><h3>Baseline Chatbot</h3><ul><li>Trả lời trực tiếp từ LLM.</li><li>Có conversation history.</li><li>Không gọi tool, không cập nhật order state.</li><li>Dễ hallucinate món, giá, trạng thái.</li></ul></div>
+          <div class="card positive"><h3>ReAct Agent</h3><ul><li>Suy nghĩ theo vòng Thought → Action → Observation.</li><li>Gọi menu/order/bill/user tools.</li><li>Không invent data; dùng kết quả tool.</li><li>Có logging, metrics và error handling.</li></ul></div>
+        </div>
+        <p class="small muted">Code evidence: <code>src/chatbot/chatbot.py</code> không có tool calling; <code>src/agent/agent.py</code> triển khai parser, executor và max-step loop.</p>
+        </div>
+</section>
+
+<section class="slide" id="slide-5">
+  <div class="slide-top"><span>Prototype Architecture</span><span>05/14</span></div>
+  <h1>Kiến trúc hiện tại: LLM Provider + Agent + Tools + Telemetry</h1>
+  <h2>Thiết kế tách lớp giúp dễ thay provider và dễ mở rộng tool.</h2>
+  <div class="content">
+        <div class="flow">
+          <div>User request</div><span>→</span><div>ReActAgent</div><span>→</span><div>Tool Router</div><span>→</span><div>Menu / Order / Bill / User</div><span>→</span><div>Final Answer</div>
+        </div>
+        <div class="columns two">
+          <div class="card"><h3>Core modules</h3><ul><li><code>src/core/*_provider.py</code>: Mock, OpenAI, Gemini, Local.</li><li><code>src/agent/agent.py</code>: agent loop and action execution.</li><li><code>src/tools/*.py</code>: business operations.</li></ul></div>
+          <div class="card"><h3>Observability</h3><ul><li><code>src/telemetry/logger.py</code>: JSONL event log.</li><li><code>src/telemetry/metrics.py</code>: token, latency, cost estimate.</li><li><code>metrics_summary.json</code>: demo summary export.</li></ul></div>
+        </div>
+        </div>
+</section>
+
+<section class="slide" id="slide-6">
+  <div class="slide-top"><span>Business Logic From Code</span><span>06/14</span></div>
+  <h1>Tool layer đã encode các thao tác nghiệp vụ chính</h1>
+  <h2>Các tool chuyển bài toán chat thành workflow có trạng thái.</h2>
+  <div class="content">
+        <table>
+          <tr><th>Tool</th><th>Responsibility</th><th>Code evidence</th></tr>
+          <tr><td>MenuTool</td><td>Tìm món theo giá, cay/không cay, category, availability</td><td><code>search_menu(max_price, spicy, category)</code></td></tr>
+          <tr><td>OrderTool</td><td>Thêm, sửa, list, mark paid, clear đơn</td><td><code>add_order</code>, <code>update_order</code>, <code>mark_paid</code></td></tr>
+          <tr><td>BillTool</td><td>Tổng hợp order, tính tổng, split bill</td><td><code>summarize_orders</code>, <code>split_bill</code></td></tr>
+          <tr><td>UserTool</td><td>Kiểm tra ai chưa order, ai chưa paid, quản lý members</td><td><code>check_missing_orders</code>, <code>check_unpaid</code></td></tr>
+        </table>
+        <div class="insight"><b>Design value:</b> LLM không trực tiếp quyết định dữ liệu; LLM chọn action, còn tool trả kết quả có cấu trúc.</div>
+        </div>
+</section>
+
+<section class="slide" id="slide-7">
+  <div class="slide-top"><span>Prototype Success</span><span>07/14</span></div>
+  <h1>Prototype đã chứng minh agent có thể thực thi workflow end-to-end</h1>
+  <h2>Các phần quan trọng đã chạy được ở mức production prototype/offline test.</h2>
+  <div class="content">
+        <div class="success-grid">
+          <div><b>Search</b><p>Gợi ý món dựa trên menu JSON thật: giá, cay/không cay, category, availability.</p></div>
+          <div><b>Order state</b><p>Lưu order theo user, note và trạng thái paid.</p></div>
+          <div><b>Bill</b><p>Tổng hợp đơn, tính tổng tiền và chia tiền theo từng người.</p></div>
+          <div><b>Missing check</b><p>So sánh members với orders để biết ai chưa chọn món.</p></div>
+          <div><b>Telemetry</b><p>Ghi log agent start/step/end và LLM metrics dạng JSONL.</p></div>
+          <div><b>Testing</b><p>40 offline tests passed trong môi trường kiểm tra hiện tại.</p></div>
+        </div>
+        </div>
+</section>
+
+<section class="slide" id="slide-8">
+  <div class="slide-top"><span>Metrics Evidence</span><span>08/14</span></div>
+  <h1>Kết quả kiểm thử và demo hiện tại</h1>
+  <h2>Dữ liệu dưới đây lấy từ test run và file metrics trong project.</h2>
+  <div class="content">
+        <div class="columns two">
+          <div class="card"><h3>Offline test run</h3><div class="big-number">40 passed</div><p>Files chạy được: <code>test_tools.py</code>, <code>test_chatbot.py</code>, <code>test_agent.py</code>.</p></div>
+          <div class="card"><h3>Demo metrics</h3><div class="big-number">867 tokens</div><p><code>total_requests=3</code>, <code>avg_latency_ms=100</code>, <code>cost_estimate=0.0087</code>.</p></div>
+        </div>
+        <div class="warning"><b>Important note:</b> <code>test_llm_providers.py</code> không collect được trong môi trường hiện tại vì thiếu package <code>openai</code>. Vì vậy slide này chỉ claim chắc chắn 40 offline tests passed.</div>
+        </div>
+</section>
+
+<section class="slide" id="slide-9">
+  <div class="slide-top"><span>Current Data Model</span><span>09/14</span></div>
+  <h1>Mock data đủ cho demo, nhưng chưa đủ cho Version 1</h1>
+  <h2>Prototype dùng JSON file, phù hợp lab; Version 1 cần persistent storage.</h2>
+  <div class="content">
+        <div class="columns two">
+          <div class="card"><h3>Menu JSON</h3><ul><li>6 món ăn.</li><li>Fields: <code>item_id</code>, <code>name</code>, <code>price</code>, <code>spicy</code>, <code>category</code>, <code>available</code>.</li><li>Có unavailable item: <code>M05 - Mì ý</code>.</li></ul></div>
+          <div class="card"><h3>Members JSON</h3><ul><li>5 members: Minh, Hạnh, Tùng, Dương, Vang.</li><li>Agent có thể kiểm tra missing orders dựa trên danh sách này.</li><li>Chưa có role, contact, payment ID.</li></ul></div>
+        </div>
+        <p class="small muted">Implication: tốt cho prototype; chưa đủ cho multi-day workflow, audit trail, payment reconciliation.</p>
+        </div>
+</section>
+
+<section class="slide" id="slide-10">
+  <div class="slide-top"><span>Known Limitations From Code</span><span>10/14</span></div>
+  <h1>Các hạn chế cần nói rõ khi demo prototype</h1>
+  <h2>Một prototype tốt cần biết rõ giới hạn kỹ thuật của chính nó.</h2>
+  <div class="content">
+        <table>
+          <tr><th>Limitation</th><th>Impact</th><th>Recommended fix</th></tr>
+          <tr><td>State lưu in-memory trong <code>OrderTool.orders</code></td><td>Mất đơn khi restart process</td><td>Dùng SQLite/PostgreSQL hoặc JSON persistence có transaction</td></tr>
+          <tr><td>Mock provider pattern-based</td><td>Chưa phản ánh năng lực LLM thật ở edge cases</td><td>Chuẩn hóa integration tests với API key qua env</td></tr>
+          <tr><td>Provider interface chưa đồng nhất</td><td>OpenAI trả tuple, Gemini/Local trả dict</td><td>Áp dụng response DTO chung</td></tr>
+          <tr><td>Action parser chỉ lấy JSON ở first line</td><td>Dễ fail nếu LLM output format lệch</td><td>Dùng structured output/schema validation</td></tr>
+          <tr><td>Có file <code>.env</code> trong zip</td><td>Rủi ro lộ secret khi push Git</td><td>Rotate key, remove from history, enforce <code>.gitignore</code></td></tr>
+        </table>
+        </div>
+</section>
+
+<section class="slide" id="slide-11">
+  <div class="slide-top"><span>Version 1 Direction</span><span>11/14</span></div>
+  <h1>Version 1 nên chuyển từ lab prototype sang workflow product nhỏ</h1>
+  <h2>Mục tiêu là giảm thao tác thủ công và tăng độ tin cậy của quy trình đặt cơm.</h2>
+  <div class="content">
+        <div class="roadmap">
+          <div><span>1</span><h3>Persistence</h3><p>Lưu menu, users, orders, payments theo ngày.</p></div>
+          <div><span>2</span><h3>UI / Channel</h3><p>Gradio/Streamlit hoặc Slack/Telegram bot cho nhóm dùng thật.</p></div>
+          <div><span>3</span><h3>Structured Agent</h3><p>Tool schema, validation, retry, fallback khi LLM output sai.</p></div>
+          <div><span>4</span><h3>Payment Flow</h3><p>QR code, payment status, reminder cho unpaid users.</p></div>
+          <div><span>5</span><h3>Monitoring</h3><p>Dashboard cho success rate, latency, token cost, failure reasons.</p></div>
+        </div>
+        </div>
+</section>
+
+<section class="slide" id="slide-12">
+  <div class="slide-top"><span>Version 1 Acceptance Criteria</span><span>12/14</span></div>
+  <h1>Định nghĩa “done” cho Version 1</h1>
+  <h2>Nên đo bằng tiêu chí vận hành, không chỉ bằng việc chatbot trả lời được.</h2>
+  <div class="content">
+        <table>
+          <tr><th>Area</th><th>Acceptance criteria</th><th>Target</th></tr>
+          <tr><td>Order capture</td><td>User chọn món, note, update/cancel trước deadline</td><td>≥ 95% successful flows</td></tr>
+          <tr><td>Menu grounding</td><td>Không gợi ý món unavailable hoặc ngoài menu</td><td>0 critical hallucination</td></tr>
+          <tr><td>Missing reminder</td><td>Detect người chưa order và tạo reminder</td><td>Correct member list</td></tr>
+          <tr><td>Billing</td><td>Tổng tiền và per-user cost khớp menu</td><td>100% deterministic</td></tr>
+          <tr><td>Observability</td><td>Mỗi flow có trace ID, status, error reason</td><td>Full audit trail</td></tr>
+        </table>
+        </div>
+</section>
+
+<section class="slide" id="slide-13">
+  <div class="slide-top"><span>Demo Script</span><span>13/14</span></div>
+  <h1>Kịch bản thuyết trình prototype</h1>
+  <h2>Dùng 3 prompt để chứng minh sự khác biệt giữa chatbot và agent.</h2>
+  <div class="content">
+        <div class="script">
+          <div><b>Prompt 1</b><p>“Gợi ý món dưới 50k không cay” → Agent gọi <code>search_menu</code> và trả món từ menu thật.</p></div>
+          <div><b>Prompt 2</b><p>“Thêm một đơn cho Minh: Cơm gà, ít cơm” → Agent gọi <code>add_order</code> và lưu trạng thái.</p></div>
+          <div><b>Prompt 3</b><p>“Ai chưa chọn món?” → Agent dùng <code>check_missing_orders</code> để đối chiếu members với orders.</p></div>
+        </div>
+        <div class="insight"><b>Message chính:</b> Chatbot trả lời; agent thực hiện công việc.</div>
+        </div>
+</section>
+
+<section class="slide" id="slide-14">
+  <div class="slide-top"><span>Conclusion</span><span>14/14</span></div>
+  <h1>Kết luận</h1>
+  <h2>Prototype đã chứng minh đúng hướng: lunch ordering là bài toán agentic workflow có tool interaction.</h2>
+  <div class="content">
+        <div class="conclusion">
+          <p><b>1.</b> Pain point thật nằm ở điều phối và kiểm soát trạng thái, không chỉ ở giao tiếp.</p>
+          <p><b>2.</b> ReAct Agent phù hợp hơn baseline chatbot vì có thể gọi tool, đọc observation và trả kết quả grounded.</p>
+          <p><b>3.</b> Prototype đã có core workflow, tool layer, telemetry và 40 offline tests passed.</p>
+          <p><b>4.</b> Version 1 cần tập trung vào persistence, structured output, UI/channel integration, security và monitoring.</p>
+        </div>
+        </div>
+</section>
+
+  </main>
+  <div class="controls"><button id="prev">Previous</button><button id="next">Next</button></div>
+  <div class="progress"></div>
+  <script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+let idx = 0;
+function show(i) {
+  idx = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, n) => s.classList.toggle('active', n === idx));
+  document.querySelector('.progress').style.width = `${((idx + 1) / slides.length) * 100}%`;
+}
+document.getElementById('next').onclick = () => show(idx + 1);
+document.getElementById('prev').onclick = () => show(idx - 1);
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight','PageDown',' '].includes(e.key)) show(idx + 1);
+  if (['ArrowLeft','PageUp'].includes(e.key)) show(idx - 1);
+  if (e.key === 'Home') show(0);
+  if (e.key === 'End') show(slides.length - 1);
+});
+show(0);
+</script>
+</body>
+</html>
