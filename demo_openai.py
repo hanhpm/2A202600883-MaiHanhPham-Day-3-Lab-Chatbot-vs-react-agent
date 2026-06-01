@@ -73,16 +73,17 @@ def demo_chatbot_openai():
         llm = OpenAIProvider(model_name="gpt-4o-mini")
         chatbot = BaselineChatbot(llm)
 
-        # test_prompts = [
-        #     "Xin chào, tôi muốn đặt cơm trưa",
-        #     "Gợi ý món dưới 50k không cay",
-        #     "Tôi thích ăn cơm gà",
-        # ]
         test_prompts = [
-        "Xin chào, tôi muốn đặt cơm trưa",
-        "Gợi ý món trên 50k",
-        "Tôi thích ăn mỳ ",
+            "Xin chào, tôi muốn đặt cơm trưa",
+            "Gợi ý món dưới 50k không cay",
+            "Tôi thích ăn cơm gà",
         ]
+        
+        # test_prompts = [
+        # "Xin chào, tôi muốn đặt cơm trưa",
+        # "Gợi ý món trên 50k",
+        # "Tôi thích ăn mỳ ",
+        # ]
 
         for prompt in test_prompts:
             print(f"\n📝 User: {prompt}")
@@ -107,16 +108,16 @@ def demo_agent_openai():
         tools, order_tool = setup_agent_tools()
         agent = ReActAgent(llm, tools, max_steps=5)
 
-        # test_prompts = [
-        #     "Gợi ý món dưới 50k không cay",
-        #     "Thêm một đơn cho Minh: Cơm gà, ít cơm",
-        #     "Ai chưa chọn món?",
-        # ]
         test_prompts = [
-        "Gợi ý món trên 50k không cay",
-        "Thêm một đơn cho Minh: Phở, thêm cay",
-        "Ai chưa chọn món?",
+            "Gợi ý món dưới 50k không cay",
+            "Thêm một đơn cho Minh: Cơm gà, ít cơm",
+            "Ai chưa chọn món?",
         ]
+        # test_prompts = [
+        # "Gợi ý món trên 50k không cay",
+        # "Thêm một đơn cho Minh: Phở, thêm cay",
+        # "Ai chưa chọn món?",
+        # ]
 
         results = []
 
