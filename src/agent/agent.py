@@ -78,6 +78,8 @@ Let's begin:"""
         scratchpad = ""
         steps = 0
         errors = []
+        trace = []
+        total_tokens = 0
 
         for step in range(self.max_steps):
             steps += 1
@@ -87,6 +89,7 @@ Let's begin:"""
 
             # Get LLM response
             llm_response, usage = self.llm.generate(prompt, system_prompt="")
+            total_tokens += usage.get("total_tokens", 0)
 
             logger.log_event(
                 "AGENT_STEP",
@@ -97,9 +100,16 @@ Let's begin:"""
                 },
             )
 
+            thought = self._extract_thought(llm_response)
+
             # Check for Final Answer
             if "Final Answer:" in llm_response:
                 final_answer = llm_response.split("Final Answer:")[-1].strip()
+                trace.append({
+                    "step": step,
+                    "thought": thought,
+                    "final_answer": final_answer,
+                })
                 logger.log_event(
                     "AGENT_END",
                     {"steps": steps, "status": "success", "answer": final_answer[:100]},
@@ -107,11 +117,13 @@ Let's begin:"""
                 return final_answer, {
                     "steps": steps,
                     "status": "success",
-                    "total_tokens": usage.get("total_tokens", 0),
+                    "total_tokens": total_tokens,
                     "errors": errors,
+                    "trace": trace,
                 }
 
             # Parse and execute action
+            action = None
             try:
                 action = self._parse_action(llm_response)
                 observation = self._execute_tool(action)
@@ -123,6 +135,13 @@ Let's begin:"""
                 observation = json.dumps(
                     {"error": "ACTION_ERROR", "message": str(e)}, ensure_ascii=False
                 )
+
+            trace.append({
+                "step": step,
+                "thought": thought,
+                "action": action,
+                "observation": observation,
+            })
 
             # Update scratchpad
             scratchpad += f"{llm_response}\nObservation: {observation}\n"
@@ -136,7 +155,20 @@ Let's begin:"""
             "status": "failed",
             "reason": error_msg,
             "errors": errors,
+            "trace": trace,
+            "total_tokens": total_tokens,
         }
+
+    def _extract_thought(self, llm_response: str) -> str:
+        """Extract Thought text from LLM response."""
+        if "Thought:" not in llm_response:
+            return ""
+        after = llm_response.split("Thought:", 1)[1]
+        for sep in ("\nAction:", "\nFinal Answer:", "\nObservation:"):
+            if sep in after:
+                after = after.split(sep, 1)[0]
+                break
+        return after.strip()
 
     def _parse_action(self, llm_response: str) -> Dict[str, Any]:
         """

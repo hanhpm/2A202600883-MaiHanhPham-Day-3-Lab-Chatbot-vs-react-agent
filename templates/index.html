@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chatbot vs ReAct Agent — Lunch Ordering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Chatbot vs ReAct Agent</h1>
+    <div class="controls">
+      <label>Provider:
+        <select id="provider">
+          <option value="mock" {% if provider == 'mock' %}selected{% endif %}>Mock</option>
+          <option value="openai" {% if provider == 'openai' %}selected{% endif %}>OpenAI</option>
+          <option value="gemini" {% if provider == 'gemini' %}selected{% endif %}>Gemini</option>
+          <option value="local" {% if provider == 'local' %}selected{% endif %}>Local (Phi-3)</option>
+        </select>
+      </label>
+      <button id="reset-btn">Reset state</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="pane">
+      <h2>Baseline Chatbot</h2>
+      <p class="hint">Plain LLM call. No tools. Will hallucinate menu data.</p>
+      <div id="chatbot-log" class="log"></div>
+    </section>
+
+    <section class="pane">
+      <h2>ReAct Agent</h2>
+      <p class="hint">Thought → Action → Observation loop. Calls real tools.</p>
+      <div id="agent-log" class="log"></div>
+    </section>
+
+    <aside class="sidebar">
+      <section>
+        <h3>Send to both</h3>
+        <textarea id="user-input" rows="3" placeholder="e.g. Gợi ý món dưới 50k không cay"></textarea>
+        <button id="send-btn">Send</button>
+      </section>
+
+      <section>
+        <h3>Menu</h3>
+        <ul class="menu-list">
+          {% for item in menu %}
+            <li>
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-price">{{ '{:,}'.format(item.price) }}đ</span>
+              {% if item.spicy %}<span class="tag spicy">cay</span>{% endif %}
+              {% if not item.available %}<span class="tag oos">hết</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h3>Members</h3>
+        <ul class="members">
+          {% for m in members %}<li>{{ m }}</li>{% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h3>Live state</h3>
+        <pre id="state-view">{}</pre>
+        <button id="refresh-state-btn">Refresh</button>
+      </section>
+    </aside>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
