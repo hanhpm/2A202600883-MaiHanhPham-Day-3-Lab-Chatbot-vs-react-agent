@@ -1,64 +1,87 @@
-# Lab Scoring Rubric: Chatbot vs ReAct Agent
+# Tiêu chí chấm điểm bài thực hành: Chatbot so với Agent ReAct
 
-This document outlines the grading criteria for Lab 3. The goal is to demonstrate deep understanding of agentic reasoning, robust monitoring, and iterative improvement.
+Tài liệu này nêu rõ các tiêu chí chấm điểm cho Bài thực hành 3. Mục tiêu là thể hiện sự hiểu biết sâu sắc về suy luận của agent, giám sát mạnh mẽ và cải tiến lặp đi lặp lại.
 
-## 👥 1. Group Score (45 Points Base + 15 Points Bonus = Max 60)
+## 👥 1. Điểm nhóm (45 điểm cơ bản + 15 điểm thưởng = Tối đa 60)
 
-This score reflects the collective output of the team. The total group score (Base + Bonus) is capped at **60 points**.
+Điểm này phản ánh kết quả chung của nhóm. Tổng điểm nhóm (Cơ bản + Thưởng) được giới hạn ở **60 điểm**.
 
-| Category | Description | Points |
+| Hạng mục | Mô tả | Điểm |
+
 | :--- | :--- | :--- |
-| **Chatbot Baseline** | Implementation of a clean, minimal chatbot baseline. | 2 |
-| **Agent v1 (Working)** | Successful implementation of the ReAct loop (2+ tools). | 7 |
-| **Agent v2 (Improved)** | Improved agent logic addressing failures identified in v1. | 7 |
-| **Tool Design Evolution** | Clear documentation of tool spec progression. | 4 |
-| **Trace Quality** | Documentation of both successful and failed traces. | 9 |
-| **Evaluation & Analysis** | Data-driven comparison (Chatbot vs Agent). | 7 |
-| **Flowchart & Insight** | Visual logic diagram and group learning points. | 5 |
-| **Code Quality** | Clean code, modularity, and telemetry integration. | 4 |
 
-> [!TIP]
-> **Group Submission**: Teams must use the [TEMPLATE_GROUP_REPORT.md] ìn the `report/group_report/` for their final submission.
+| **Chatbot cơ bản** | Triển khai một chatbot cơ bản, tối thiểu và đơn giản. | 2 |
 
-### 🎁 Group Bonus Points (Max +15)
+| **Agent v1 (Hoạt động)** | Triển khai thành công vòng lặp ReAct (2+ công cụ). | 7 |
 
-Bonus points can be earned to reach the **60-point cap** or to compensate for missed base points:
+| **Agent v2 (Đã cải tiến)** | Cải thiện logic của agent, khắc phục các lỗi được xác định trong v1. | 7 |
 
-| Bonus Category | Description | Points |
+| **Sự phát triển thiết kế công cụ** | Tài liệu rõ ràng về sự tiến triển của đặc tả công cụ. | 4 |
+
+| **Chất lượng theo dõi** | Ghi chép cả các dấu vết thành công và thất bại. | 9 |
+
+| **Đánh giá & Phân tích** | So sánh dựa trên dữ liệu (Chatbot so với Agent). | 7 |
+
+| **Sơ đồ & Thông tin chi tiết** | Sơ đồ logic trực quan và các điểm học tập nhóm. | 5 |
+
+| **Chất lượng mã** | Mã sạch, tính mô đun và tích hợp đo từ xa. | 4 |
+
+> [!MẸO]
+
+> **Nộp bài nhóm**: Các nhóm phải sử dụng [TEMPLATE_GROUP_REPORT.md] trong `report/group_report/` cho bài nộp cuối cùng của họ.
+
+### 🎁 Điểm thưởng nhóm (Tối đa +15)
+
+Điểm thưởng có thể được kiếm để đạt đến **giới hạn 60 điểm** hoặc để bù đắp cho điểm cơ bản bị thiếu:
+
+| Hạng mục thưởng | Mô tả | Điểm |
+
 | :--- | :--- | :--- |
-| **Extra Monitoring** | Adding complex industry metrics (Cost, Token ratio, etc.). | +3 |
-| **Extra Tools** | Implementing advanced tools (Browsing, Search, etc.). | +2 |
-| **Failure Handling** | Sophisticated retry logic or guardrails. | +3 |
-| **Live System Demo** | Successful live demonstration to the instructor. | +5 |
-| **Ablation Experiments** | Comparison of prompt/tool variations. | +2 |
+
+| **Giám sát bổ sung** | Thêm các chỉ số phức tạp của ngành (Chi phí, Tỷ lệ Token, v.v.). | +3 |
+
+| **Công cụ bổ sung** | Triển khai các công cụ nâng cao (Duyệt web, Tìm kiếm, v.v.). | +2 |
+
+| **Xử lý lỗi** | Logic thử lại phức tạp hoặc các biện pháp bảo vệ. | +3 |
+
+| **Trình diễn hệ thống trực tiếp** | Trình diễn trực tiếp thành công cho giảng viên. | +5 |
+
+| **Thí nghiệm loại bỏ** | So sánh các biến thể của lời nhắc/công cụ. | +2 |
 
 ---
 
-## 👤 2. Individual Score (40 Points)
+## 👤 2. Điểm cá nhân (40 điểm)
 
-To earn the full 40 points, each student must submit an `individual_report.md` in the `report/individual_reports/` directory.
+Để đạt được 40 điểm tối đa, mỗi sinh viên phải nộp một báo cáo cá nhân (`individual_report.md`) trong thư mục `report/individual_reports/`.
 
-| Component | Rubric / Requirement | Points |
+| Thành phần | Tiêu chí/Yêu cầu | Điểm |
+
 | :--- | :--- | :--- |
-| **I. Technical Contribution** | List of specific code modules, tools, or tests implemented. Evidence of code quality and clarity. | 15 |
-| **II. Debugging Case Study** | A detailed analysis of at least one failure (hallucination, loop, parser error) and how it was resolved using Telemetry/Logs. | 10 |
-| **III. Personal Insights** | A deep reflection on the fundamental differences between LLM Chatbots vs ReAct Agents based on the lab results. | 10 |
-| **IV. Future Improvements** | Proprosal for scaling this agent to a production-level RAG or multi-agent system. | 5 |
+
+| **I. Đóng góp kỹ thuật** | Danh sách các mô-đun mã, công cụ hoặc bài kiểm tra cụ thể đã được triển khai. Bằng chứng về chất lượng và độ rõ ràng của mã. | 15 |
+
+| **II. Nghiên cứu trường hợp gỡ lỗi** | Phân tích chi tiết ít nhất một lỗi (ảo giác, vòng lặp, lỗi phân tích cú pháp) và cách khắc phục bằng cách sử dụng Dữ liệu đo từ xa/Nhật ký. | 10 |
+
+| **III. Nhận định cá nhân** | Suy ngẫm sâu sắc về sự khác biệt cơ bản giữa Chatbot LLM và Agent ReAct dựa trên kết quả thực hành. | 10 |
+
+| **IV. Cải tiến trong tương lai** | Đề xuất mở rộng quy mô hệ thống này lên hệ thống RAG hoặc hệ thống đa tác nhân ở cấp độ sản xuất. | 5 |
 
 ---
 
-## 🏎️ Total Score Calculation
+## 🏎️ Tính điểm tổng
 
-The final grade for each student is calculated as:
-**Total = MIN(60, Group Base + Group Bonus) + Individual Score (max 40) = 100 Points Max**
+Điểm cuối cùng của mỗi học sinh được tính như sau:
 
-> [!IMPORTANT]
-> **Scoring Transparency**: The detailed template for the individual report can be found at `report/individual_reports/TEMPLATE_INDIVIDUAL_REPORT.md`.
+**Tổng = MIN(60, Điểm cơ bản nhóm + Điểm thưởng nhóm) + Điểm cá nhân (tối đa 40) = 100 điểm**
 
-> [!IMPORTANT]
-> **Accountability**: The 40% individual weighting is designed to ensure every student contributes significantly and understands the underlying mechanics of the agentic loop.
+> [!QUAN TRỌNG]
+
+> **Tính minh bạch về điểm số**: Mẫu báo cáo cá nhân chi tiết có thể được tìm thấy tại `report/individual_reports/TEMPLATE_INDIVIDUAL_REPORT.md`.
+
+> [!QUAN TRỌNG]
+> **Trách nhiệm giải trình**: Tỷ trọng cá nhân 40% được thiết kế để đảm bảo mỗi sinh viên đều đóng góp đáng kể và hiểu được cơ chế hoạt động cơ bản của vòng lặp tác nhân.
 
 ---
 
-> [!IMPORTANT]
-> **"Fail Early, Learn Fast"**: We value the quality of your **Error Analysis** as much as the final working code. A well-documented failure trace is worth more than a "perfect" system with no explanation.
+> [!QUAN TRỌNG]
+> **"Thất bại sớm, học hỏi nhanh"**: Chúng tôi coi trọng chất lượng **Phân tích lỗi** của bạn cũng như mã nguồn cuối cùng hoạt động tốt. Một bản ghi lỗi được ghi chép đầy đủ có giá trị hơn một hệ thống "hoàn hảo" mà không có lời giải thích.

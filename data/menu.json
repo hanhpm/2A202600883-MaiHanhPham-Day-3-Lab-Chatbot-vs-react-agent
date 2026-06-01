@@ -1,0 +1,50 @@
+[
+  {
+    "item_id": "M01",
+    "name": "Cơm gà",
+    "price": 45000,
+    "spicy": false,
+    "category": "rice",
+    "available": true
+  },
+  {
+    "item_id": "M02",
+    "name": "Bún thịt nướng",
+    "price": 50000,
+    "spicy": false,
+    "category": "noodle",
+    "available": true
+  },
+  {
+    "item_id": "M03",
+    "name": "Cơm cay",
+    "price": 40000,
+    "spicy": true,
+    "category": "rice",
+    "available": true
+  },
+  {
+    "item_id": "M04",
+    "name": "Phở bò",
+    "price": 55000,
+    "spicy": false,
+    "category": "soup",
+    "available": true
+  },
+  {
+    "item_id": "M05",
+    "name": "Mì ý",
+    "price": 60000,
+    "spicy": false,
+    "category": "pasta",
+    "available": false
+  },
+  {
+    "item_id": "M06",
+    "name": "Gà nướng cay",
+    "price": 48000,
+    "spicy": true,
+    "category": "grilled",
+    "available": true
+  }
+]

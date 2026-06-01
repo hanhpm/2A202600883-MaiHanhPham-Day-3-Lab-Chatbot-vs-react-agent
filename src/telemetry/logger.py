@@ -1,45 +1,57 @@
-import logging
 import json
 import os
 from datetime import datetime
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any, Dict, Optional
 
-class IndustryLogger:
-    """
-    Structured logger that simulates industry practices.
-    Logs to both console and a file in JSON format.
-    """
-    def __init__(self, name: str = "AI-Lab-Agent", log_dir: str = "logs"):
-        self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.INFO)
-        
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
 
-        # File Handler (JSON)
-        log_file = os.path.join(log_dir, f"{datetime.now().strftime('%Y-%m-%d')}.log")
-        file_handler = logging.FileHandler(log_file)
-        
-        # Console Handler
-        console_handler = logging.StreamHandler()
-        
-        self.logger.addHandler(file_handler)
-        self.logger.addHandler(console_handler)
+class JSONLLogger:
+    """Logger that writes events to JSONL (JSON Lines) format."""
+
+    def __init__(self, log_dir: str = "logs"):
+        self.log_dir = Path(log_dir)
+        self.log_dir.mkdir(exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.log_file = self.log_dir / f"agent_telemetry_{timestamp}.jsonl"
 
     def log_event(self, event_type: str, data: Dict[str, Any]):
-        """Logs an event with a timestamp and type."""
-        payload = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "event": event_type,
-            "data": data
+        """
+        Log an event as a JSON line.
+        Format: {"timestamp": "...", "event_type": "...", "data": {...}}
+        """
+        event = {
+            "timestamp": datetime.now().isoformat(),
+            "event_type": event_type,
+            "data": data,
         }
-        self.logger.info(json.dumps(payload))
 
-    def info(self, msg: str):
-        self.logger.info(msg)
+        try:
+            with self.log_file.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(event, ensure_ascii=False) + "\n")
+        except Exception as e:
+            print(f"Error writing to log: {e}")
 
-    def error(self, msg: str, exc_info=True):
-        self.logger.error(msg, exc_info=exc_info)
+    def read_logs(self) -> list[Dict[str, Any]]:
+        """Read all logged events from the JSONL file."""
+        logs = []
+        if not self.log_file.exists():
+            return logs
+
+        try:
+            with self.log_file.open("r", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        logs.append(json.loads(line))
+        except Exception as e:
+            print(f"Error reading logs: {e}")
+
+        return logs
+
+    def get_log_file_path(self) -> str:
+        """Get the path to the current log file."""
+        return str(self.log_file)
+
 
 # Global logger instance
-logger = IndustryLogger()
+logger = JSONLLogger()

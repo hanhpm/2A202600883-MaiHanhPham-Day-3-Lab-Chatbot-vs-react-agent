@@ -1,0 +1,8 @@
+{
+  "total_requests": 3,
+  "total_tokens": 867,
+  "total_cost_estimate": 0.0087,
+  "avg_latency_ms": 100.0,
+  "max_latency_ms": 100,
+  "min_latency_ms": 100
+}

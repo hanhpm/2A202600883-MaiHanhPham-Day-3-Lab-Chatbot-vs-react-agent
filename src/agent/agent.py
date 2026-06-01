@@ -1,16 +1,16 @@
-import os
+import json
 import re
-from typing import List, Dict, Any, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 from src.core.llm_provider import LLMProvider
 from src.telemetry.logger import logger
 
+
 class ReActAgent:
     """
-    SKELETON: A ReAct-style Agent that follows the Thought-Action-Observation loop.
-    Students should implement the core loop logic and tool execution.
+    ReAct (Reasoning + Acting) Agent that follows the Thought-Action-Observation loop.
     """
-    
-    def __init__(self, llm: LLMProvider, tools: List[Dict[str, Any]], max_steps: int = 5):
+
+    def __init__(self, llm: LLMProvider, tools: Dict[str, Callable], max_steps: int = 5):
         self.llm = llm
         self.tools = tools
         self.max_steps = max_steps
@@ -18,57 +18,179 @@ class ReActAgent:
 
     def get_system_prompt(self) -> str:
         """
-        TODO: Implement the system prompt that instructs the agent to follow ReAct.
-        Should include:
-        1.  Available tools and their descriptions.
-        2.  Format instructions: Thought, Action, Observation.
+        System prompt that instructs the agent to follow ReAct format.
         """
-        tool_descriptions = "\n".join([f"- {t['name']}: {t['description']}" for t in self.tools])
-        return f"""
-        You are an intelligent assistant. You have access to the following tools:
-        {tool_descriptions}
+        tool_names = ", ".join(self.tools.keys())
+        tool_descriptions = "\n".join(
+            [f"- {name}: {self._get_tool_description(name)}" for name in self.tools.keys()]
+        )
 
-        Use the following format:
-        Thought: your line of reasoning.
-        Action: tool_name(arguments)
-        Observation: result of the tool call.
-        ... (repeat Thought/Action/Observation if needed)
-        Final Answer: your final response.
-        """
+        return f"""You are a helpful lunch ordering assistant. You are an intelligent agent that reasons through problems step by step.
 
-    def run(self, user_input: str) -> str:
+You have access to the following tools:
+{tool_descriptions}
+
+Use the following format exactly:
+Thought: your reasoning about what to do next
+Action: {{"tool": "tool_name", "args": {{...}}}}
+Observation: [result from tool call]
+... (repeat Thought/Action/Observation as needed)
+Final Answer: your final response to the user
+
+Rules:
+1. Action MUST be valid JSON with "tool" and "args" keys
+2. Only use tools from: {tool_names}
+3. If you have enough information, provide Final Answer
+4. Never invent data - only use tool results
+5. Be concise and helpful
+
+Let's begin:"""
+
+    def _get_tool_description(self, tool_name: str) -> str:
+        """Get description for a tool."""
+        descriptions = {
+            "search_menu": "Search menu items by price, spicy level, or category",
+            "add_order": "Add a lunch order for a user",
+            "update_order": "Update an existing order",
+            "get_order": "Get order details for a user",
+            "list_orders": "List all current orders",
+            "mark_paid": "Mark an order as paid",
+            "clear_orders": "Clear all orders",
+            "summarize_orders": "Summarize all orders with total cost",
+            "split_bill": "Calculate cost per user",
+            "get_payment_status": "Check payment status",
+            "check_missing_orders": "Check who hasn't ordered yet",
+            "check_unpaid": "Check who hasn't paid yet",
+            "get_members": "Get list of team members",
+            "add_member": "Add a new team member",
+            "remove_member": "Remove a team member",
+        }
+        return descriptions.get(tool_name, "Unknown tool")
+
+    def run(self, user_input: str) -> Tuple[str, Dict[str, Any]]:
         """
-        TODO: Implement the ReAct loop logic.
-        1. Generate Thought + Action.
-        2. Parse Action and execute Tool.
-        3. Append Observation to prompt and repeat until Final Answer.
+        Run the ReAct agent loop.
+        Returns: (final_answer, metrics)
         """
         logger.log_event("AGENT_START", {"input": user_input, "model": self.llm.model_name})
-        
-        current_prompt = user_input
+
+        system_prompt = self.get_system_prompt()
+        scratchpad = ""
         steps = 0
+        errors = []
 
-        while steps < self.max_steps:
-            # TODO: Generate LLM response
-            # result = self.llm.generate(current_prompt, system_prompt=self.get_system_prompt())
-            
-            # TODO: Parse Thought/Action from result
-            
-            # TODO: If Action found -> Call tool -> Append Observation
-            
-            # TODO: If Final Answer found -> Break loop
-            
+        for step in range(self.max_steps):
             steps += 1
-            
-        logger.log_event("AGENT_END", {"steps": steps})
-        return "Not implemented. Fill in the TODOs!"
 
-    def _execute_tool(self, tool_name: str, args: str) -> str:
+            # Build prompt with system, scratchpad, and user input
+            prompt = f"{system_prompt}\n\n{scratchpad}\nUser: {user_input}\n"
+
+            # Get LLM response
+            llm_response, usage = self.llm.generate(prompt, system_prompt="")
+
+            logger.log_event(
+                "AGENT_STEP",
+                {
+                    "step": step,
+                    "llm_response": llm_response[:200],  # First 200 chars for logging
+                    "tokens": usage.get("total_tokens", 0),
+                },
+            )
+
+            # Check for Final Answer
+            if "Final Answer:" in llm_response:
+                final_answer = llm_response.split("Final Answer:")[-1].strip()
+                logger.log_event(
+                    "AGENT_END",
+                    {"steps": steps, "status": "success", "answer": final_answer[:100]},
+                )
+                return final_answer, {
+                    "steps": steps,
+                    "status": "success",
+                    "total_tokens": usage.get("total_tokens", 0),
+                    "errors": errors,
+                }
+
+            # Parse and execute action
+            try:
+                action = self._parse_action(llm_response)
+                observation = self._execute_tool(action)
+            except Exception as e:
+                error_msg = f"Error at step {step}: {str(e)}"
+                errors.append(error_msg)
+                logger.log_event("AGENT_ERROR", {"step": step, "error": error_msg})
+
+                observation = json.dumps(
+                    {"error": "ACTION_ERROR", "message": str(e)}, ensure_ascii=False
+                )
+
+            # Update scratchpad
+            scratchpad += f"{llm_response}\nObservation: {observation}\n"
+
+        # Max steps exceeded
+        error_msg = "Max steps exceeded"
+        logger.log_event("AGENT_END", {"steps": steps, "status": "failed", "reason": error_msg})
+
+        return "Max steps reached. Please rephrase your request.", {
+            "steps": steps,
+            "status": "failed",
+            "reason": error_msg,
+            "errors": errors,
+        }
+
+    def _parse_action(self, llm_response: str) -> Dict[str, Any]:
         """
-        Helper method to execute tools by name.
+        Parse Action JSON from LLM response.
+        Format: Action: {"tool": "...", "args": {...}}
         """
-        for tool in self.tools:
-            if tool['name'] == tool_name:
-                # TODO: Implement dynamic function calling or simple if/else
-                return f"Result of {tool_name}"
-        return f"Tool {tool_name} not found."
+        if "Action:" not in llm_response:
+            raise ValueError("No Action found in response")
+
+        action_text = llm_response.split("Action:")[-1].strip()
+
+        # Extract JSON (first line usually)
+        lines = action_text.split("\n")
+        json_str = lines[0].strip()
+
+        try:
+            action = json.loads(json_str)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in Action: {json_str}") from e
+
+        if "tool" not in action or "args" not in action:
+            raise ValueError("Action must have 'tool' and 'args' keys")
+
+        return action
+
+    def _execute_tool(self, action: Dict[str, Any]) -> str:
+        """
+        Execute a tool and return result as JSON string.
+        """
+        tool_name = action.get("tool")
+        args = action.get("args", {})
+
+        if tool_name not in self.tools:
+            return json.dumps(
+                {"error": "UNKNOWN_TOOL", "message": f"Tool '{tool_name}' not found"},
+                ensure_ascii=False,
+            )
+
+        try:
+            tool_func = self.tools[tool_name]
+            result = tool_func(**args)
+
+            # Ensure result is JSON-serializable
+            if isinstance(result, (dict, list, str, int, float, bool, type(None))):
+                return json.dumps(result, ensure_ascii=False)
+            else:
+                return json.dumps({"result": str(result)}, ensure_ascii=False)
+
+        except TypeError as e:
+            return json.dumps(
+                {"error": "INVALID_ARGUMENTS", "message": f"Invalid arguments: {str(e)}"},
+                ensure_ascii=False,
+            )
+        except Exception as e:
+            return json.dumps(
+                {"error": "TOOL_ERROR", "message": f"Tool error: {str(e)}"}, ensure_ascii=False
+            )
