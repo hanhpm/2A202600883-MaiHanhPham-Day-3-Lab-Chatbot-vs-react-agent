@@ -112,13 +112,31 @@ class AppState:
             self.chatbot.clear_history()
 
     def state_snapshot(self) -> dict:
+        bill = self._bill_with_orders()
+        summary = bill.summarize_orders() if self.order_tool.orders else {
+            "orders": [], "total": 0, "count": 0, "status": "success"
+        }
         return {
             "provider": self.provider_name,
             "orders": self.order_tool.orders,
+            "summary": summary,
             "members": self.user_tool.members,
             "missing": self.user_tool.check_missing_orders(self.order_tool.orders),
-            "payment": self._bill_with_orders().get_payment_status(),
+            "payment": bill.get_payment_status(),
         }
+
+
+TOOL_WHITELIST = {
+    "summarize_orders",
+    "split_bill",
+    "get_payment_status",
+    "check_missing_orders",
+    "check_unpaid",
+    "mark_paid",
+    "clear_orders",
+    "list_orders",
+    "get_members",
+}
 
 
 state = AppState()
@@ -190,6 +208,24 @@ def api_reset():
 @app.route("/api/state")
 def api_state():
     return jsonify(state.state_snapshot())
+
+
+@app.route("/api/tool/<name>", methods=["POST"])
+def api_tool(name):
+    """Direct tool invocation (no LLM). Used by quick-action buttons."""
+    if name not in TOOL_WHITELIST:
+        return jsonify({"error": f"Tool '{name}' is not exposed via this endpoint"}), 403
+    if name not in state.tools:
+        return jsonify({"error": f"Tool '{name}' not registered"}), 404
+    args = request.get_json(silent=True) or {}
+    try:
+        with state.lock:
+            result = state.tools[name](**args)
+    except TypeError as e:
+        return jsonify({"error": f"Invalid args: {e}"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    return jsonify({"tool": name, "result": result})
 
 
 @app.route("/api/logs/tail")

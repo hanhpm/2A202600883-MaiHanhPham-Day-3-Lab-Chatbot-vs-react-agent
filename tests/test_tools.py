@@ -21,7 +21,7 @@ def menu_tool():
 def order_tool():
     """Fixture for OrderTool."""
     tool = OrderTool()
-    menu_data = json.loads(Path("data/menu.json").read_text())
+    menu_data = json.loads(Path("data/menu.json").read_text(encoding="utf-8"))
     tool.set_menu(menu_data)
     return tool
 
@@ -30,7 +30,7 @@ def order_tool():
 def bill_tool():
     """Fixture for BillTool."""
     tool = BillTool()
-    menu_data = json.loads(Path("data/menu.json").read_text())
+    menu_data = json.loads(Path("data/menu.json").read_text(encoding="utf-8"))
     tool.set_menu(menu_data)
     return tool
 
@@ -71,15 +71,16 @@ class TestMenuTool:
         """Test getting a specific menu item."""
         item = menu_tool.get_item_by_id("M01")
         assert item is not None
-        assert item["name"] == "Cơm gà"
+        assert item["name"] == "Cơm gà xối mỡ"
         assert item["price"] == 45000
 
     def test_search_unavailable_items(self, menu_tool):
         """Test that unavailable items are excluded."""
         result = menu_tool.search_menu()
-        # M05 (Mì ý) is unavailable, should not be in results
         item_ids = [item["item_id"] for item in result["items"]]
-        assert "M05" not in item_ids
+        # M14 (Canh chua cá lóc) and M33 (Kem dừa Thái) are unavailable
+        assert "M14" not in item_ids
+        assert "M33" not in item_ids
 
 
 class TestOrderTool:
@@ -137,25 +138,25 @@ class TestBillTool:
     def test_summarize_orders(self, bill_tool, order_tool):
         """Test summarizing orders."""
         order_tool.add_order("Minh", "M01")  # 45k
-        order_tool.add_order("Hạnh", "M02")  # 50k
+        order_tool.add_order("Hạnh", "M02")  # 55k
         bill_tool.set_orders(order_tool.orders)
 
         result = bill_tool.summarize_orders()
         assert result["status"] == "success"
         assert result["count"] == 2
-        assert result["total"] == 95000
+        assert result["total"] == 100000
 
     def test_split_bill(self, bill_tool, order_tool):
         """Test splitting bill."""
         order_tool.add_order("Minh", "M01")  # 45k
-        order_tool.add_order("Hạnh", "M02")  # 50k
+        order_tool.add_order("Hạnh", "M02")  # 55k
         bill_tool.set_orders(order_tool.orders)
 
         result = bill_tool.split_bill()
         assert result["status"] == "success"
-        assert result["total"] == 95000
+        assert result["total"] == 100000
         assert result["per_user"]["Minh"] == 45000
-        assert result["per_user"]["Hạnh"] == 50000
+        assert result["per_user"]["Hạnh"] == 55000
 
     def test_get_payment_status(self, bill_tool, order_tool):
         """Test getting payment status."""

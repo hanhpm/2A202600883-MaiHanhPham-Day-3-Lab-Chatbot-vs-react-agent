@@ -1,7 +1,7 @@
 [
   {
     "item_id": "M01",
-    "name": "Cơm gà",
+    "name": "Cơm gà xối mỡ",
     "price": 45000,
     "spicy": false,
     "category": "rice",
@@ -9,6 +9,38 @@
   },
   {
     "item_id": "M02",
+    "name": "Cơm tấm sườn bì chả",
+    "price": 55000,
+    "spicy": false,
+    "category": "rice",
+    "available": true
+  },
+  {
+    "item_id": "M03",
+    "name": "Cơm chiên hải sản",
+    "price": 65000,
+    "spicy": false,
+    "category": "rice",
+    "available": true
+  },
+  {
+    "item_id": "M04",
+    "name": "Cơm cay Hàn Quốc",
+    "price": 70000,
+    "spicy": true,
+    "category": "rice",
+    "available": true
+  },
+  {
+    "item_id": "M05",
+    "name": "Cơm gà Hải Nam",
+    "price": 60000,
+    "spicy": false,
+    "category": "rice",
+    "available": true
+  },
+  {
+    "item_id": "M06",
     "name": "Bún thịt nướng",
     "price": 50000,
     "spicy": false,
@@ -16,35 +48,235 @@
     "available": true
   },
   {
-    "item_id": "M03",
-    "name": "Cơm cay",
-    "price": 40000,
+    "item_id": "M07",
+    "name": "Bún bò Huế",
+    "price": 55000,
     "spicy": true,
-    "category": "rice",
+    "category": "noodle",
     "available": true
   },
   {
-    "item_id": "M04",
-    "name": "Phở bò",
+    "item_id": "M08",
+    "name": "Bún chả Hà Nội",
+    "price": 50000,
+    "spicy": false,
+    "category": "noodle",
+    "available": true
+  },
+  {
+    "item_id": "M09",
+    "name": "Mì Quảng",
+    "price": 48000,
+    "spicy": false,
+    "category": "noodle",
+    "available": true
+  },
+  {
+    "item_id": "M10",
+    "name": "Mì cay 7 cấp độ",
+    "price": 65000,
+    "spicy": true,
+    "category": "noodle",
+    "available": true
+  },
+  {
+    "item_id": "M11",
+    "name": "Phở bò tái",
     "price": 55000,
     "spicy": false,
     "category": "soup",
     "available": true
   },
   {
-    "item_id": "M05",
-    "name": "Mì ý",
+    "item_id": "M12",
+    "name": "Phở gà",
+    "price": 50000,
+    "spicy": false,
+    "category": "soup",
+    "available": true
+  },
+  {
+    "item_id": "M13",
+    "name": "Hủ tiếu Nam Vang",
+    "price": 52000,
+    "spicy": false,
+    "category": "soup",
+    "available": true
+  },
+  {
+    "item_id": "M14",
+    "name": "Canh chua cá lóc",
     "price": 60000,
     "spicy": false,
-    "category": "pasta",
+    "category": "soup",
     "available": false
   },
   {
-    "item_id": "M06",
+    "item_id": "M15",
+    "name": "Gà nướng mật ong",
+    "price": 75000,
+    "spicy": false,
+    "category": "grilled",
+    "available": true
+  },
+  {
+    "item_id": "M16",
     "name": "Gà nướng cay",
     "price": 48000,
     "spicy": true,
     "category": "grilled",
+    "available": true
+  },
+  {
+    "item_id": "M17",
+    "name": "Bò nướng lá lốt",
+    "price": 80000,
+    "spicy": false,
+    "category": "grilled",
+    "available": true
+  },
+  {
+    "item_id": "M18",
+    "name": "Sườn nướng BBQ",
+    "price": 85000,
+    "spicy": false,
+    "category": "grilled",
+    "available": true
+  },
+  {
+    "item_id": "M19",
+    "name": "Mì Ý sốt bò bằm",
+    "price": 70000,
+    "spicy": false,
+    "category": "pasta",
+    "available": true
+  },
+  {
+    "item_id": "M20",
+    "name": "Mì Ý sốt kem nấm",
+    "price": 75000,
+    "spicy": false,
+    "category": "pasta",
+    "available": true
+  },
+  {
+    "item_id": "M21",
+    "name": "Mì Ý hải sản cay",
+    "price": 90000,
+    "spicy": true,
+    "category": "pasta",
+    "available": true
+  },
+  {
+    "item_id": "M22",
+    "name": "Salad ức gà",
+    "price": 55000,
+    "spicy": false,
+    "category": "salad",
+    "available": true
+  },
+  {
+    "item_id": "M23",
+    "name": "Salad Caesar",
+    "price": 60000,
+    "spicy": false,
+    "category": "salad",
+    "available": true
+  },
+  {
+    "item_id": "M24",
+    "name": "Gỏi cuốn tôm thịt",
+    "price": 35000,
+    "spicy": false,
+    "category": "salad",
+    "available": true
+  },
+  {
+    "item_id": "M25",
+    "name": "Cơm chay thập cẩm",
+    "price": 40000,
+    "spicy": false,
+    "category": "vegetarian",
+    "available": true
+  },
+  {
+    "item_id": "M26",
+    "name": "Đậu hũ sốt cà chua",
+    "price": 35000,
+    "spicy": false,
+    "category": "vegetarian",
+    "available": true
+  },
+  {
+    "item_id": "M27",
+    "name": "Bánh mì thịt nguội",
+    "price": 25000,
+    "spicy": false,
+    "category": "sandwich",
+    "available": true
+  },
+  {
+    "item_id": "M28",
+    "name": "Bánh mì chảo",
+    "price": 45000,
+    "spicy": false,
+    "category": "sandwich",
+    "available": true
+  },
+  {
+    "item_id": "M29",
+    "name": "Trà sữa trân châu",
+    "price": 30000,
+    "spicy": false,
+    "category": "drink",
+    "available": true
+  },
+  {
+    "item_id": "M30",
+    "name": "Cà phê sữa đá",
+    "price": 25000,
+    "spicy": false,
+    "category": "drink",
+    "available": true
+  },
+  {
+    "item_id": "M31",
+    "name": "Nước cam ép",
+    "price": 35000,
+    "spicy": false,
+    "category": "drink",
+    "available": true
+  },
+  {
+    "item_id": "M32",
+    "name": "Chè khúc bạch",
+    "price": 30000,
+    "spicy": false,
+    "category": "dessert",
+    "available": true
+  },
+  {
+    "item_id": "M33",
+    "name": "Kem dừa Thái",
+    "price": 45000,
+    "spicy": false,
+    "category": "dessert",
+    "available": false
+  },
+  {
+    "item_id": "M34",
+    "name": "Lẩu Thái hải sản",
+    "price": 150000,
+    "spicy": true,
+    "category": "hotpot",
+    "available": true
+  },
+  {
+    "item_id": "M35",
+    "name": "Lẩu gà lá é",
+    "price": 130000,
+    "spicy": false,
+    "category": "hotpot",
     "available": true
   }
 ]

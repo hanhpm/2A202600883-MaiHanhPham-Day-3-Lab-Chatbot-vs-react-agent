@@ -49,7 +49,7 @@ Let's begin:"""
     def _get_tool_description(self, tool_name: str) -> str:
         """Get description for a tool."""
         descriptions = {
-            "search_menu": "Search menu items by price, spicy level, or category",
+            "search_menu": "Search menu by max_price (int), spicy (bool), category (one of: rice|noodle|soup|grilled|pasta|salad|vegetarian|sandwich|drink|dessert|hotpot), or keyword (substring match on item name, e.g. 'bò', 'gà', 'phở', 'chay'). Do NOT pass ingredients as category — use keyword instead.",
             "add_order": "Add a lunch order for a user",
             "update_order": "Update an existing order",
             "get_order": "Get order details for a user",

@@ -1,16 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="utf-8">
-  <title>Chatbot vs ReAct Agent — Lunch Ordering</title>
+  <title>Chatbot vs ReAct Agent — Đặt cơm trưa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="topbar">
-    <h1>Chatbot vs ReAct Agent</h1>
+    <div class="brand">
+      <div class="logo">LO</div>
+      <div>
+        <h1>Lunch Order Lab</h1>
+        <p class="subtitle">Baseline Chatbot vs ReAct Agent</p>
+      </div>
+    </div>
     <div class="controls">
-      <label>Provider:
+      <label class="field">
+        <span class="field-label">Provider</span>
         <select id="provider">
           <option value="mock" {% if provider == 'mock' %}selected{% endif %}>Mock</option>
           <option value="openai" {% if provider == 'openai' %}selected{% endif %}>OpenAI</option>
@@ -18,55 +28,101 @@
           <option value="local" {% if provider == 'local' %}selected{% endif %}>Local (Phi-3)</option>
         </select>
       </label>
-      <button id="reset-btn">Reset state</button>
+      <label class="field">
+        <span class="field-label">Tôi là</span>
+        <select id="current-user">
+          <option value="">— ẩn danh —</option>
+          {% for m in members %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+        </select>
+      </label>
+      <button id="reset-btn" class="btn btn-ghost">Reset</button>
     </div>
   </header>
 
   <main class="layout">
     <section class="pane">
-      <h2>Baseline Chatbot</h2>
-      <p class="hint">Plain LLM call. No tools. Will hallucinate menu data.</p>
+      <header class="pane-header">
+        <h2>Baseline Chatbot</h2>
+        <span class="pill">no tools</span>
+      </header>
+      <p class="hint">Gọi LLM trực tiếp. Không có công cụ, dễ bịa dữ liệu menu.</p>
       <div id="chatbot-log" class="log"></div>
     </section>
 
     <section class="pane">
-      <h2>ReAct Agent</h2>
-      <p class="hint">Thought → Action → Observation loop. Calls real tools.</p>
+      <header class="pane-header">
+        <h2>ReAct Agent</h2>
+        <span class="pill pill-accent">tools enabled</span>
+      </header>
+      <p class="hint">Vòng lặp Thought → Action → Observation, gọi tool thật.</p>
       <div id="agent-log" class="log"></div>
     </section>
 
     <aside class="sidebar">
-      <section>
-        <h3>Send to both</h3>
-        <textarea id="user-input" rows="3" placeholder="e.g. Gợi ý món dưới 50k không cay"></textarea>
-        <button id="send-btn">Send</button>
+      <section class="card">
+        <h3>Gửi cho cả hai</h3>
+        <textarea id="user-input" rows="3" placeholder="VD: Gợi ý món có thịt bò dưới 60k"></textarea>
+        <div class="row">
+          <span id="user-tag" class="user-tag hidden">@<span id="user-tag-name"></span></span>
+          <button id="send-btn" class="btn btn-primary">Gửi (Ctrl+Enter)</button>
+        </div>
       </section>
 
-      <section>
-        <h3>Menu</h3>
-        <ul class="menu-list">
+      <section class="card">
+        <h3>Quick actions <small>(không qua LLM)</small></h3>
+        <div class="quick-actions">
+          <button class="btn quick" data-tool="summarize_orders">Tính tổng bill</button>
+          <button class="btn quick" data-tool="split_bill">Chia tiền</button>
+          <button class="btn quick" data-tool="check_missing_orders">Ai chưa chọn?</button>
+          <button class="btn quick" data-tool="check_unpaid">Ai chưa trả?</button>
+          <button class="btn quick warn" data-tool="clear_orders" data-confirm="Xóa toàn bộ đơn?">Xóa hết đơn</button>
+        </div>
+        <div id="tool-result" class="tool-result hidden"></div>
+      </section>
+
+      <section class="card">
+        <header class="card-head">
+          <h3>Đơn hiện tại</h3>
+          <span id="orders-total" class="badge">0 món · 0đ</span>
+        </header>
+        <table class="orders-table">
+          <thead>
+            <tr><th>User</th><th>Món</th><th>Giá</th><th>Trả</th><th></th></tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <tr class="empty"><td colspan="5">Chưa có đơn nào</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card collapsible">
+        <header class="card-head clickable" data-toggle="menu-body">
+          <h3>Menu <small>({{ menu|length }} món)</small></h3>
+          <span class="chevron">▾</span>
+        </header>
+        <ul id="menu-body" class="menu-list">
           {% for item in menu %}
-            <li>
+            <li class="menu-item">
               <span class="item-name">{{ item.name }}</span>
-              <span class="item-price">{{ '{:,}'.format(item.price) }}đ</span>
-              {% if item.spicy %}<span class="tag spicy">cay</span>{% endif %}
-              {% if not item.available %}<span class="tag oos">hết</span>{% endif %}
+              <span class="item-meta">
+                <span class="item-price">{{ '{:,}'.format(item.price) }}đ</span>
+                <span class="tag cat">{{ item.category }}</span>
+                {% if item.spicy %}<span class="tag spicy">cay</span>{% endif %}
+                {% if not item.available %}<span class="tag oos">hết</span>{% endif %}
+              </span>
             </li>
           {% endfor %}
         </ul>
       </section>
 
-      <section>
-        <h3>Members</h3>
-        <ul class="members">
+      <section class="card collapsible">
+        <header class="card-head clickable" data-toggle="members-body">
+          <h3>Thành viên <small>({{ members|length }})</small></h3>
+          <span class="chevron">▾</span>
+        </header>
+        <ul id="members-body" class="members">
           {% for m in members %}<li>{{ m }}</li>{% endfor %}
         </ul>
-      </section>
-
-      <section>
-        <h3>Live state</h3>
-        <pre id="state-view">{}</pre>
-        <button id="refresh-state-btn">Refresh</button>
       </section>
     </aside>
   </main>
